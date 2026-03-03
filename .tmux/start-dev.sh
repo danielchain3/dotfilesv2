@@ -6,20 +6,23 @@ SESSION="dev"
 tmux has-session -t $SESSION 2>/dev/null
 
 if [ $? != 0 ]; then
-  # Create new session
-  tmux new-session -d -s $SESSION -n editor
+  # Create detached session
+  tmux new-session -d -s $SESSION -n main
 
-  # Split first window vertically
-  tmux split-window -h
+  # Split panes explicitly
+  tmux split-window -h -t $SESSION:0.0   # Split pane 0 horizontally -> pane 1
+  tmux split-window -v -t $SESSION:0.1   # Split pane 1 vertically -> pane 2
 
-  # Split right pane horizontally
-  tmux select-pane -t 1
-  tmux split-window -v
+  # Select top-left pane as the default starting pane
+  tmux select-pane -t $SESSION:0.0
 
-  # Optional: run commands in panes
-  # tmux send-keys -t editor:0.0 'cd ~/projects && nvim' C-m
-  # tmux send-keys -t editor:0.1 'cd ~/projects && git status' C-m
-  # tmux send-keys -t editor:0.2 'cd ~/projects && htop' C-m
+  # Optional: send commands to each pane
+   # # Pane 0: editor
+   # tmux send-keys -t $SESSION:0.0 'cd ~/projects && nvim' C-m
+   # # Pane 1: git status
+   # tmux send-keys -t $SESSION:0.1 'cd ~/projects && git status' C-m
+   # # Pane 2: monitor system
+   # tmux send-keys -t $SESSION:0.2 'htop' C-m
 fi
 
 # Attach to session
